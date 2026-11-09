@@ -577,7 +577,7 @@ function patCharacter(clientX, clientY) {
 }
 
 // 絵文字を一切使わず、テキスト記号・AA（アスキーアート）をポワポワ発生！
-const PAT_SYMBOLS = ["♡", "★", "☆", "♪", "(･ω･)b", "(*'ω'*)", "(´▽｀)", "(´∀｀*)", "☆彡"];
+const PAT_SYMBOLS = ["(仮)"];
 
 function createPatParticle(x, y) {
     const layer = document.getElementById("patpatEffectLayer");
@@ -600,13 +600,7 @@ function createPatParticle(x, y) {
 }
 
 const PAT_SPEECHES = [
-    "……ん、なに？ くすぐったいよ。",
-    "えへへ、なでてくれるの？ うれしい！",
-    "ありがと！ いつも見ててくれてるんだね。",
-    "……別に、嫌じゃないけどさ。",
-    "ふふっ、もっと撫でてくれてもいいよ？",
-    "なでなでされるの、なんだか落ち着くなぁ。",
-    "きょうも一緒にいられてよかった！"
+    "(仮)"
 ];
 
 function triggerPatReaction() {
@@ -615,9 +609,9 @@ function triggerPatReaction() {
 
     if (c && c.name) {
         if (c.personality && c.personality.includes("ツンデレ")) {
-            speech = `「べ、別に嬉しくなんかないんだからね！……でも、手は離さないで。」`;
+            speech = `「(仮)」`;
         } else if (c.personality && (c.personality.includes("クーデレ") || c.personality.includes("クール"))) {
-            speech = `「……。心地いいです。続けてください。」`;
+            speech = `「(仮)」`;
         }
     }
 
@@ -658,7 +652,6 @@ function loadLoreData() {
         try { 
             worldLore = JSON.parse(local); 
             // 以前のサンプルデータを自動削除
-            worldLore = worldLore.filter(l => l.title !== "星輝魔術体系" && l.title !== "第七特殊警備班");
             localStorage.setItem("world_lore", JSON.stringify(worldLore));
         } catch (e) { 
             worldLore = []; 
@@ -2833,7 +2826,11 @@ function addReturnToPortalButton() {
         btn.id = "return-portal-btn";
         btn.innerHTML = "← スタートページに戻る";
         btn.style.cssText = "display: block; width: 90%; margin: 20px auto 10px; padding: 12px; background: var(--secondary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;";
-        btn.onclick = () => { window.location.href = window.location.pathname; };
+        btn.onclick = () => {
+            const currentUrl = new URL(window.location.href);
+            currentUrl.search = ""; // クエリパラメータ(?id=...)を消去
+            window.location.href = currentUrl.toString();
+        };
         sidebar.appendChild(btn);
     }
 }
