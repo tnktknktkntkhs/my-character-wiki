@@ -1,1 +1,1 @@
-# my-character-wik
+# my-character-wiki
