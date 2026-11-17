@@ -1753,6 +1753,10 @@ function updateViewMode() {
                     button[onclick^="editCharacter"], button[onclick^="deleteCharacter"] { display: none !important; }
                     button[onclick^="toggleFavorite"] { display: none !important; }
                     #sort option[value="favorite"] { display: none !important; }
+                    #episode-title, #novel-output { 
+                        background-color: #f8fafc !important; 
+                        border: 1px dashed #cbd5e1 !important; 
+                    }
                 `;
                 document.head.appendChild(styleTag);
             }
@@ -1781,9 +1785,10 @@ function updateViewMode() {
     toggleUI("myPageBtn", onOwnPage ? "none" : "inline-block");
 
     const isOwner = !currentId || currentPageAuthorId === null || user.uid === currentPageAuthorId;
+    const displayName = myProfileName ? `（${myProfileName}）` : "";
 
     if (isOwner && !previewAsVisitor) {
-        updateText("loginStatus", currentId ? (myProfileName || "作者空間") : "");
+        updateText("loginStatus", currentId ? `${t("js.editMode")}` : (myProfileName || t("header.loggedIn")));
         applyBlock(false);
         toggleUI("publishBtn", "inline-block");
         toggleUI("themeCustomizeBtn", isOwner && currentId ? "inline-flex" : "none");
@@ -1791,6 +1796,15 @@ function updateViewMode() {
         toggleUI("previewToggleBtn", isOwner && currentId ? "inline-block" : "none");
         updateText("previewToggleBtn", t("js.previewAsVisitor"));
         toggleUI("settingsGearBtn", isOwner && currentId ? "inline-flex" : "none");
+
+        if (currentId) {
+            const hintKey = `formHintShown_${currentId}`;
+            if (!localStorage.getItem(hintKey)) {
+                if (typeof openFormPanel === "function") openFormPanel();
+                localStorage.setItem(hintKey, "true");
+            }
+        }
+
     } else if (isOwner && previewAsVisitor) {
         updateText("loginStatus", t("js.previewMode"));
         toggleUI("publishBtn", "none");
@@ -1799,6 +1813,7 @@ function updateViewMode() {
         toggleUI("previewToggleBtn", "inline-block");
         updateText("previewToggleBtn", t("js.backToEdit"));
         toggleUI("settingsGearBtn", "none");
+
     } else {
         updateText("loginStatus", t("js.viewMode"));
         toggleUI("publishBtn", "none");
@@ -1830,7 +1845,7 @@ function openSettingsPanel() {
             const targetId = visibility === "unlisted" ? "visibilityUnlisted" : "visibilityPublic";
             const radio = document.getElementById(targetId);
             if (radio) radio.checked = true;
-        }).catch(console.error);
+        }).catch((error) => console.error("設定の読み込みに失敗:", error));
     }
     panel.style.display = "flex";
 }
@@ -2134,7 +2149,7 @@ function addCharacter() {
 
     localStorage.setItem("characters", JSON.stringify(characters));
     display();
-    closeFormPanel();
+    if (wasEditing) closeFormPanel();
     alert(`キャラクター「${characterData.name}」を${wasEditing ? '更新' : '登録'}しました！`);
 }
 window.addCharacter = addCharacter;
